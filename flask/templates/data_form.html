@@ -1,0 +1,47 @@
+<!Doctype HTML>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Reconstruction Selection Form</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/data_form.css') }}">
+</head>
+<body> 
+
+<div class="header">
+	<img src="/static/logo.png" class="logo"></img>
+<h1>PReSto Visualization Generator</h1>
+</div>
+
+<div class="form">
+<p><label for="reconstruction" class="subheader">Choose a reconstruction:</label></p>
+   <form action="http://localhost:5000/viz" method="POST">
+        <select name="reconstruction" class="input">
+                {% for file in files%}
+                <option value={{file}}>{{file}}</option>
+                 {% endfor %}
+        </select>
+        <input type="submit" class="button" id="submit">
+   </form>
+</div>
+
+   <div>
+	<p id="loading" class="load"></p>
+   </div>
+
+	<script>
+		const form = document.querySelector("#submit")
+		const loading = document.querySelector("#loading")
+		
+		form.addEventListener('click', showLoading)
+
+		function showLoading() {
+			loading.innerHTML = "Please wait while your visualization is loading."
+		}
+	</script>
+<div class="footer">
+	<h1>footer</h1>
+</div>
+</body>
+
+</html>

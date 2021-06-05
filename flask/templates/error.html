@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=UTF8>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/error.css') }}">
+  </head>
+  <body>
+    <div class="header">
+	<img src="/static/logo.png" class="logo"></img>
+	<h1>PReSto Visualization Generator</h1>
+	</div>
+
+    <div>
+      <p>A server error occured.</p>
+    </div>
+	<div class="redirect">
+	<form action="http://localhost:5000" method="POST">
+		<button>Resubmit Form</button>
+	</form>
+     </div>
+    <div class="footer">
+	    <h1>footer</h1>
+	</div>
+  </body>
+</html>

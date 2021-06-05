@@ -1,0 +1,66 @@
+
+
+
+* {
+  	box-sizing: border-box;
+}
+
+body {
+	background: linear-gradient(to left, #2F3E46, #CAD2C5);
+}
+
+.logo {
+	width: 5em;
+   	float: left;
+}
+
+.header{
+   background-image: url(/static/leaf_pattern_cropped.jpg);
+   color: #FEFAE0;
+   font-family: georgia;
+   text-align: center;
+   padding: 20px;
+   position: fixed;
+   width: 100%;
+   top: 0;
+   left: 0;
+}
+
+.form {
+   margin-left: 20em;
+   background-color: #CAD2C5;
+   padding: 2em;
+   width: 50em;
+   height: 10em;
+   margin-top: 10em;
+}
+
+.subheader {
+   font-size: 1.5em;
+}
+
+.input {
+   text-align: center;
+   padding: 0.2em;
+   font-size: 1em;
+}
+
+.button {
+   background-color: #FEFAE0;
+   font-size: 1em;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #000000;
+  height: 1em;
+}
+
+.load {
+	text-align: center;
+	font-size: 1.5em;
+}
+

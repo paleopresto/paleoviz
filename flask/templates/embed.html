@@ -1,0 +1,26 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Geospatial Visualization</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/embed.css') }}">
+</head>
+
+<body>
+    <div class="header">
+	<img src="/static/logo.png" class="logo"></img>
+	<h1>PReSto Visualization Generator</h1>
+	</div>
+	<div class="plot">
+  	{{ script|safe }}
+  	</div>
+
+<form action="http://localhost:5000" method="POST">
+	<button class="redirect">Select New Dataset</button>
+</form>
+<div class="footer">
+	<h1>footer</h1>
+</div>
+</body>
+</html>

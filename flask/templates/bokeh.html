@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/bokeh.css') }}">
+	<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.0.min.js"
+        crossorigin="anonymous"></script>
+	<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.0.min.js"
+        crossorigin="anonymous"></script>
+	<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.3.0.min.js"
+        crossorigin="anonymous"></script>
+	{{script | safe}}
+</head>
+
+<body>
+<div class="header">
+	<img src="/static/logo.png" class="logo"></img>
+<h1>PReSto Visualization Generator</h1>
+</div>
+<div class="plot">
+    {{div | safe}}
+    </div>
+    <div class="redirect">
+	<form action="http://localhost:5000" method="POST">
+		<button>Select New Dataset</button>
+	</form>
+     </div>
+<div class="footer">
+	<h1>footer</h1>
+</div>
+</body>
+
+</html>
