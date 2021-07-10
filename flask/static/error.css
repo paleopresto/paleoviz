@@ -1,0 +1,40 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+	background: linear-gradient(to left, #2F3E46, #CAD2C5);
+}
+
+.logo {
+	width: 5em;
+	float: left;
+}
+
+.header{
+   background-image: url(/static/leaf_pattern_cropped.jpg);
+   color: #FEFAE0;
+   font-family: georgia;
+   text-align: center;
+   padding: 20px;
+   position: fixed;
+   width: 100%;
+   top: 0;
+   left: 0;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #000000;
+  height: 1em;
+}
+
+
+p {
+  margin-top: 7em;
+  margin-left: 23.5em;
+  font-size: 1.5em;
+}
