@@ -11,9 +11,6 @@ from os import listdir
 
 app = Flask(__name__)
 
-# global list of bokeh servers
-thread_manager = None
-
 # locally creates a page
 @app.route('/', methods=['POST', 'GET'])
 def index():
