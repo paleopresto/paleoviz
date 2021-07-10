@@ -4,18 +4,18 @@
 <head>
   <meta charset="utf-8">
   <title>Reconstruction Selection Form</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='data_form.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='data_form.css', _external=True) }}">
 </head>
 <body> 
 
 <div class="header">
-	<img src="/static/logo.png" class="logo"></img>
+	<img src="url_for('static', filename='logo.png')" class="logo"></img>
 <h1>PReSto Visualization Generator</h1>
 </div>
 
 <div class="form">
 <p><label for="reconstruction" class="subheader">Choose a reconstruction:</label></p>
-   <form action="http://localhost:5000/viz" method="POST">
+   <form action="" method="POST">
         <select name="reconstruction" class="input">
                 {% for file in files%}
                 <option value={{file}}>{{file}}</option>

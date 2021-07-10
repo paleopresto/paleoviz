@@ -1,5 +1,5 @@
 # flask imports
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 #panel and bokeh imports
 import panel as pn
 from bokeh.client import pull_session
@@ -14,18 +14,20 @@ app = Flask(__name__)
 # locally creates a page
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    files = listdir('../../data/')
-    return render_template('data_form.html', files=files)
+    if request.method == 'POST':
+        selection = request.form['reconstruction']
+        return redirect(url_for('viz', filename=selection))
+    else:
+    	files = listdir('data/')
+    	return render_template('data_form.html', files=files)
 
-@app.route('/viz', methods=['POST', 'GET'])
-def viz():
+@app.route('/viz/<filename>', methods=['POST', 'GET'])
+def viz(filename):
 
-    # get user choice for dataset 
-    selection = request.form['reconstruction']
-    datapath = '../../data/' + selection
-    
+    # get user choice for dataset
+    datapath = 'data/' + filename
     viz_type = vl.get_viz_type(datapath)
-    
+
     if viz_type == 'geo':
         print(datapath)
         with pull_session(url='http://localhost:' + str(5005), arguments=dict(datapath=datapath)) as session:
@@ -47,9 +49,8 @@ if __name__ == '__main__':
     
     
     # start main app server loop
-    app.run(host='localhost', port=5000, debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
     
     # stop the managed threads
     bokeh_server.stop()
     print('Visualization server cleanup complete. Exiting...')
-    
