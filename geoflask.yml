@@ -1,13 +1,9 @@
 name: geoflask
 channels:
   - pyviz
-  - conda-forge
-  - defaults
 dependencies:
-  - geoviews-core=1.9.1
-  - flask=1.1.2
-  - panel=0.11.0
-  - apscheduler=3.7.0
-  - xarray=0.17.0
-  - netcdf4=1.4.2
-  - bokeh=2.3.0
+  - geoviews-core
+  - flask
+  - panel
+  - xarray
+  - netcdf4
