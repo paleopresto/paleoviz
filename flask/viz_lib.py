@@ -136,22 +136,21 @@ def start_server(threaded=False, io_loop=None, **kwargs):
             loop = IOLoop()
         else:
             loop = io_loop
-
         server = StoppableThread(target=create_server, io_loop=loop, kwargs=kwargs)
     else:
         server = create_server(**kwargs)
-    
     return server
     
     
     
 def create_server(**kwargs):
-
     # create a handler for application. Should only need the one
     viz_handlers = FunctionHandler(add_viz_model)
     
     # create an application
     viz_app = Application(viz_handlers)
+    
+    
     
     # create server
     viz_server = Server(viz_app, **kwargs)
@@ -169,16 +168,24 @@ def create_server(**kwargs):
         pass
     
     viz_server.start()
+    
     viz_server.io_loop.start()
     return viz_server
     
     
 def add_viz_model(doc):
     args = doc.session_context.request.arguments
-    datapath = str(args.get('datapath')[0].decode('UTF-8'))
-    
-    xr_dataset = xr.open_dataset(datapath).load()
-    viz = generate_geospatial(xr_dataset)
-    
+    if args.get('datapath') == None:
+        viz = "Error occurred!"
+        print("Error occurred!")
+    else:
+        datapath = str(args.get('datapath')[0].decode('UTF-8'))
+        if not isfile(datapath):
+            viz = "Error occurred!"
+            print("Error occurred!")
+        else:
+            xr_dataset = xr.open_dataset(datapath).load()
+            viz = generate_geospatial(xr_dataset)
+            print("viz made!")
     # create a panel from the holoviews DynamicMap and attach it to the document.
     panel(viz).server_doc(doc=doc)

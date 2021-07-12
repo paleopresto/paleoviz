@@ -13,6 +13,7 @@ import json
 
 app = Flask(__name__)
 
+# configuration
 try:
     with open('server_config.json', 'r') as config_file:
         config_dict = json.load(config_file)
@@ -28,6 +29,8 @@ flask_port_num = config_dict['flask_port_num']
 embed_host = config_dict['embed_host']
 flask_host = config_dict['flask_host']
 
+data_dir = config_dict.get("data_dir", "data/")
+
 embed_url = 'http://' + embed_host + ':' + str(embed_port_num)
 flask_url = 'http://' + flask_host + ':' + str(flask_port_num)
 
@@ -39,18 +42,17 @@ def index():
         selection = request.form['reconstruction']
         return redirect(url_for('viz', filename=selection))
     else:
-    	files = listdir('data/')
+    	files = listdir(data_dir)
     	return render_template('data_form.html', files=files)
 
 @app.route('/viz/<filename>', methods=['POST', 'GET'])
 def viz(filename):
 
     # get user choice for dataset
-    datapath = 'data/' + filename
-    viz_type = vl.get_viz_type(datapath)
+    datapath = data_dir + filename
+    viz_type = 'geo'#vl.get_viz_type(datapath)
 
     if viz_type == 'geo':
-        print(datapath)
         with pull_session(url=embed_url, arguments=dict(datapath=datapath)) as session:
             # generate a script to load the customized session
             script = server_session(session_id=session.id, url=embed_url)
@@ -64,20 +66,21 @@ def viz(filename):
 
 
 if __name__ == '__main__':
-    
-    
     print(f" - Configuration: ")
     print(f"  - Flask server port: {flask_port_num}\n  - Flask hostname: {flask_host}")
     print(f"  - Embedded server port: {embed_port_num}\n  - Embedded hostname: {embed_host}")
-
-    
     print(f' - Starting embedded server on port {embed_port_num}...')
-    embed_server = vl.start_server(threaded=True, allow_websocket_origin=[flask_url], show=False,port=embed_port_num)
-    
-    
+    embed_server = vl.start_server(threaded=True, allow_websocket_origin=['localhost:5000'], show=True,port=embed_port_num)
+    embed_server.start()
+    if embed_server.is_alive():
+        print(' - Embedded server created successfully!')
+    else:
+        print('Embedded server encountered an error! Exiting...')
+        exit()
+
     # start main app server loop
     app.run(host=flask_host, port=flask_port_num, debug=True, use_reloader=False)
-    
+
     # stop the managed threads
     bokeh_server.stop()
-    print('Visualization server cleanup complete. Exiting...')
+    print(' - Visualization server cleanup complete. Exiting...')
