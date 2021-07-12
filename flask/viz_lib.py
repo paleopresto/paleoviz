@@ -37,7 +37,7 @@ def generate_visualization(datapath, **kwargs):
     if(len(xr_dataset.dims) > 2):
         # geospatial visualization
         geo_viz = generate_geospatial(xr_dataset)
-        print(type(pn.panel(geo_viz)))
+        #print(type(pn.panel(geo_viz)))
         server_thread = pn.serve(geo_viz, **kwargs)
         print(f'Server started on port {kwargs["port"]} with dataset at {datapath}.')
         return server_thread
