@@ -13,10 +13,9 @@
     <div>
       <p>A server error occured.</p>
     </div>
-	<div class="redirect">
-	<form action="http://localhost:5000" method="POST">
-		<button>Resubmit Form</button>
-	</form>
+    <a href="{{ url_for('index') }}">
+	<button class="redirect">Select New Dataset</button>
+    </a>
      </div>
     <div class="footer">
 	    <h1>footer</h1>
