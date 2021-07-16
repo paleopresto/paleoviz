@@ -50,7 +50,7 @@ def viz(filename):
 
     # get user choice for dataset
     datapath = data_dir + filename
-    viz_type = 'geo'#vl.get_viz_type(datapath)
+    viz_type = vl.get_viz_type(datapath)
 
     if viz_type == 'geo':
         with pull_session(url=embed_url, arguments=dict(datapath=datapath)) as session:
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     print(f"  - Flask server port: {flask_port_num}\n  - Flask hostname: {flask_host}")
     print(f"  - Embedded server port: {embed_port_num}\n  - Embedded hostname: {embed_host}")
     print(f' - Starting embedded server on port {embed_port_num}...')
-    embed_server = vl.start_server(threaded=True, allow_websocket_origin=['localhost:5000'], show=True,port=embed_port_num)
+    embed_server = vl.start_server(threaded=True, allow_websocket_origin=[flask_host + ':' + flask_port], show=True,port=embed_port_num)
     embed_server.start()
     if embed_server.is_alive():
         print(' - Embedded server created successfully!')
