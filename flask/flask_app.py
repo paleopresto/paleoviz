@@ -50,6 +50,7 @@ def viz(filename):
 
     # get user choice for dataset
     datapath = data_dir + filename
+    print(datapath)
     viz_type = vl.get_viz_type(datapath)
 
     if viz_type == 'geo':
