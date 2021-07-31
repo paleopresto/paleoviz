@@ -1,5 +1,4 @@
-name:
-  - geoflask
+name: geoflask
 channels:
   - pyviz
 dependencies:
