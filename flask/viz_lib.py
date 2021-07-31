@@ -23,6 +23,7 @@ from bokeh.application.handlers.function import FunctionHandler
 from bokeh.application.application import Application
 from tornado.ioloop import IOLoop
 
+from asyncio import set_event_loop, new_event_loop
 
 #set holoviews backend to bokeh
 hv.extension('bokeh')
@@ -153,7 +154,9 @@ def create_server(**kwargs):
     
     
     # create server
+    set_event_loop(new_event_loop())
     viz_server = Server(viz_app, **kwargs)
+    
     
     
     def signal_exit():
