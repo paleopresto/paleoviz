@@ -6,6 +6,7 @@ from os.path import isfile
 from panel.pane.holoviews import HoloViews
 from panel.io.server import StoppableThread
 from panel.pane.base import panel
+import panel as pn
 
 # holoviews and geoviews imports
 import holoviews as hv
@@ -192,3 +193,7 @@ def add_viz_model(doc):
             print("viz made!")
     # create a panel from the holoviews DynamicMap and attach it to the document.
     panel(viz).server_doc(doc=doc)
+
+
+def start_hello_server():
+    return pn.serve("Hello world!", threaded=True, port=5005, allow_websocket_origin=['*'])
