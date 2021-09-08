@@ -7,32 +7,25 @@ from bokeh.embed import server_session
 # local imports
 import viz_lib as vl
 #standard imports
+import sys
 from os import listdir
 import json
 
-
 app = Flask(__name__)
 
-# configuration
-try:
-    with open('server_config.json', 'r') as config_file:
-        config_dict = json.load(config_file)
-except OSError as e:
-    # use defaults
-    config_dict = {'embed_port_num':5005, 'flask_port_num':5000, 'embed_host':'localhost', 'flask_host':'localhost'}
-    with open('server_config.json', 'w') as config_file:
-        json.dump(config_dict, config_file)
+config_filename = None;
 
-embed_port_num = config_dict['embed_port_num']
-flask_port_num = config_dict['flask_port_num']
+embed_port_num = None
+flask_port_num = None
+embed_host = None
+flask_host = None
+embed_protocol = None
+flask_protocol = None
+data_dir = None
+embed_url = None
+flask_url = None
 
-embed_host = config_dict['embed_host']
-flask_host = config_dict['flask_host']
 
-data_dir = config_dict.get("data_dir", "data/")
-
-embed_url = 'http://' + embed_host + ':' + str(embed_port_num)
-flask_url = 'http://' + flask_host + ':' + str(flask_port_num)
 
 
 # locally creates a page
@@ -67,9 +60,42 @@ def viz(filename):
 
 
 if __name__ == '__main__':
+
+    if len(sys.argv) > 1:
+        print(f'- Using provided config file: {sys.argv[1]}')
+        config_filename = sys.argv[1]
+    else:
+        print('- No config file provided. Using default: server_config.json')
+        config_filename = 'server_config.json'
+    # configuration
+    try:
+        with open(config_filename, 'r') as config_file:
+            config_dict = json.load(config_file)
+    except OSError as ose:
+        print('Error occurred while attempting to open config file. Using defaults...')
+        # use defaults
+        config_dict = {'embed_port_num':5005, 'flask_port_num':5000, 'embed_host':'localhost', 'flask_host':'localhost'}
+        with open('server_config.json', 'w') as config_file:
+            json.dump(config_dict, config_file)
+
+    embed_port_num = config_dict['embed_port_num']
+    flask_port_num = config_dict['flask_port_num']
+
+    embed_protocol = config_dict['embed_protocol']
+    flask_protocol = config_dict['flask_protocol']
+    
+    embed_host = config_dict['embed_host']
+    flask_host = config_dict['flask_host']
+
+    data_dir = config_dict.get("data_dir", "data/")
+
+    embed_url = embed_protocol + '://' + embed_host + ':' + str(embed_port_num)
+    flask_url = flask_protocol + '://' + flask_host + ':' + str(flask_port_num)
+
+
     print(f" - Configuration: ")
-    print(f"  - Flask server port: {flask_port_num}\n  - Flask hostname: {flask_host}")
-    print(f"  - Embedded server port: {embed_port_num}\n  - Embedded hostname: {embed_host}")
+    print(f"  - Flask server port: {flask_port_num}\n  - Flask hostname: {flask_host}\n  - Flask protocol: {flask_protocol}")
+    print(f"  - Embedded server port: {embed_port_num}\n  - Embedded hostname: {embed_host}\n  - Embedded protocol: {embed_protocol}")
     print(f' - Starting embedded server on port {embed_port_num}...')
     embed_server = vl.start_server(threaded=True, allow_websocket_origin=[flask_host + ':' + str(flask_port_num)], show=True,port=embed_port_num)
     embed_server.start()
@@ -80,8 +106,8 @@ if __name__ == '__main__':
         exit()
 
     # start main app server loop
-    app.run(host=flask_host, port=flask_port_num, debug=True, use_reloader=False)
+    app.run(host=flask_host, port=flask_port_num, debug=True, use_reloader=False)   
 
     # stop the managed threads
-    bokeh_server.stop()
+    embed_server.stop()
     print(' - Visualization server cleanup complete. Exiting...')
