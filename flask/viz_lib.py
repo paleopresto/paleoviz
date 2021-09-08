@@ -151,13 +151,9 @@ def create_server(**kwargs):
     # create an application
     viz_app = Application(viz_handlers)
     
-    
-    
     # create server
     set_event_loop(new_event_loop())
     viz_server = Server(viz_app, **kwargs)
-    
-    
     
     def signal_exit():
         viz_server.io_loop.add_callback_from_signal(do_stop)

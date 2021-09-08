@@ -43,7 +43,6 @@ def viz(filename):
 
     # get user choice for dataset
     datapath = data_dir + filename
-    print(datapath)
     viz_type = vl.get_viz_type(datapath)
 
     if viz_type == 'geo':
@@ -106,7 +105,7 @@ if __name__ == '__main__':
         exit()
 
     # start main app server loop
-    app.run(host=flask_host, port=flask_port_num, debug=True, use_reloader=False)   
+    app.run(host=flask_host, port=flask_port_num, debug=True, use_reloader=False)
 
     # stop the managed threads
     embed_server.stop()
