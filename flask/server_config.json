@@ -1,0 +1,9 @@
+{
+  "embed_port_num": 5005, 
+  "flask_port_num": 5000, 
+  "embed_protocol": "http", 
+  "flask_protocol": "http", 
+  "embed_host": "localhost", 
+  "flask_host": "localhost", 
+  "data_dir": "../../../data/"
+}
