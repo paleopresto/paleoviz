@@ -185,6 +185,5 @@ def add_viz_model(doc):
         else:
             xr_dataset = xr.open_dataset(datapath).load()
             viz = generate_geospatial(xr_dataset)
-            print("viz made!")
     # create a panel from the holoviews DynamicMap and attach it to the document.
     panel(viz).server_doc(doc=doc)
