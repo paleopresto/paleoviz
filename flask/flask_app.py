@@ -13,17 +13,22 @@ import json
 
 app = Flask(__name__)
 
+# filepath to look for a config file at
 config_filename = None;
+# bokeh server config 
+bokeh_port_num = None
+bokeh_host = None
+bokeh_protocol = None
+bokeh_url = None
 
-embed_port_num = None
 flask_port_num = None
-embed_host = None
 flask_host = None
-embed_protocol = None
 flask_protocol = None
-data_dir = None
-embed_url = None
 flask_url = None
+
+data_dir = None
+
+
 
 
 
@@ -45,14 +50,16 @@ def viz(filename):
     datapath = data_dir + filename
     viz_type = vl.get_viz_type(datapath)
 
+    print(f'  - Viz type requested: {viz_type}')
+
     if viz_type == 'geo':
-        with pull_session(url=embed_url, arguments=dict(datapath=datapath)) as session:
+        with pull_session(url=bokeh_url, arguments=dict(datapath=datapath)) as session:
             # generate a script to load the customized session
-            script = server_session(session_id=session.id, url=embed_url)
+            script = server_session(session_id=session.id, url=bokeh_url)
             #use the script in the rendered page
         return render_template('embed.html', script=script, template='Flask')
     elif viz_type == 'time':
-        timeseries_tuple = vl.generate_timeseries(datapath)
+        timeseries_tuple = vl.generate_timeseries_html(datapath, plot_width=500, plot_height=500)
         return render_template('bokeh.html', script=timeseries_tuple[0], div=timeseries_tuple[1], template='Flask')
     else:
         return render_template('error.html')
@@ -73,40 +80,40 @@ if __name__ == '__main__':
     except OSError as ose:
         print('Error occurred while attempting to open config file. Using defaults...')
         # use defaults
-        config_dict = {'embed_port_num':5005, 'flask_port_num':5000, 'embed_host':'localhost', 'flask_host':'localhost'}
+        config_dict = {'bokeh_port_num':5005, 'flask_port_num':5000, 'bokeh_host':'localhost', 'flask_host':'localhost'}
         with open('server_config.json', 'w') as config_file:
             json.dump(config_dict, config_file)
 
-    embed_port_num = config_dict['embed_port_num']
+    bokeh_port_num = config_dict['bokeh_port_num']
     flask_port_num = config_dict['flask_port_num']
 
-    embed_protocol = config_dict['embed_protocol']
+    bokeh_protocol = config_dict['bokeh_protocol']
     flask_protocol = config_dict['flask_protocol']
     
-    embed_host = config_dict['embed_host']
+    bokeh_host = config_dict['bokeh_host']
     flask_host = config_dict['flask_host']
 
     data_dir = config_dict.get("data_dir", "data/")
 
-    embed_url = embed_protocol + '://' + embed_host + ':' + str(embed_port_num)
+    bokeh_url = bokeh_protocol + '://' + bokeh_host + ':' + str(bokeh_port_num)
     flask_url = flask_protocol + '://' + flask_host + ':' + str(flask_port_num)
 
 
     print(f" - Configuration: ")
     print(f"  - Flask server port: {flask_port_num}\n  - Flask hostname: {flask_host}\n  - Flask protocol: {flask_protocol}")
-    print(f"  - Embedded server port: {embed_port_num}\n  - Embedded hostname: {embed_host}\n  - Embedded protocol: {embed_protocol}")
-    print(f' - Starting embedded server on port {embed_port_num}...')
-    embed_server = vl.start_server(threaded=True, allow_websocket_origin=[flask_host + ':' + str(flask_port_num)], show=True,port=embed_port_num)
-    embed_server.start()
-    if embed_server.is_alive():
-        print(' - Embedded server created successfully!')
+    print(f"  - Bokeh server port: {bokeh_port_num}\n  - Bokeh hostname: {bokeh_host}\n  - Bokeh protocol: {bokeh_protocol}")
+    print(f' - Starting embedded bokeh server on port {bokeh_port_num}...')
+    bokeh_server = vl.start_server(threaded=True, allow_websocket_origin=[flask_host + ':' + str(flask_port_num)], show=True,port=bokeh_port_num)
+    bokeh_server.start()
+    if bokeh_server.is_alive():
+        print(' - Bokeh server created successfully!')
     else:
-        print('Embedded server encountered an error! Exiting...')
+        print('Bokeh server encountered an error! Exiting...')
         exit()
 
     # start main app server loop
     app.run(host=flask_host, port=flask_port_num, debug=True, use_reloader=False)
 
     # stop the managed threads
-    embed_server.stop()
+    bokeh_server.stop()
     print(' - Visualization server cleanup complete. Exiting...')

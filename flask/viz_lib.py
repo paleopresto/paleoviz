@@ -1,6 +1,12 @@
+'''
+A small module to support creation of custom bokeh plots and server processes
+'''
+
+
 # basic python imports
 import signal
 from os.path import isfile
+import time
 
 # panel imports
 from panel.pane.holoviews import HoloViews
@@ -29,39 +35,29 @@ from asyncio import set_event_loop, new_event_loop
 hv.extension('bokeh')
 
 
-def generate_visualization(datapath, **kwargs):
-    if not isfile(datapath):
-        return None
-
-    xr_dataset = xr.open_dataset(datapath).load()
-    # decide what to make by checking key dimensions
-    if(len(xr_dataset.dims) > 2):
-        # geospatial visualization
-        geo_viz = generate_geospatial(xr_dataset)
-        #print(type(pn.panel(geo_viz)))
-        server_thread = pn.serve(geo_viz, **kwargs)
-        print(f'Server started on port {kwargs["port"]} with dataset at {datapath}.')
-        return server_thread
-    elif (len(xr_dataset.dims) == 2):
-        # time series
-        return generate_timeseries(xr_dataset)
-    else:
-        # uninterpritable data error
-        return None
-        
-        
 def get_viz_type(datapath):
+    '''Generates either a time series(as a tuple of string),
+    geospatial visualization, or returns None
+    
+    Parameters
+    ----------
+    datapath : str
+        The file location of the dataset to check
+    Returns
+    -------
+        A string describing the viz type or None on error.
+    '''
     if not isfile(datapath):
         return None
 
-    xr_dataset = xr.open_dataset(datapath).load()
+    xr_dataset = xr.open_dataset(datapath)
     # decide what to make by checking key dimensions
     dim_len = len(xr_dataset.dims)
     xr_dataset.close()
-    if(dim_len > 2):
+    if(dim_len > 3):
         # geospatial visualization
         return 'geo'
-    elif (dim_len == 2):
+    elif (dim_len == 3):
         # time series
         return 'time'
     else:
@@ -69,7 +65,21 @@ def get_viz_type(datapath):
         return None
     
 
-def generate_geospatial(xr_dataset):
+def generate_geospatial(datapath, **kwargs):
+    '''Generates and returns a geospatial visualization as a HoloViews DynamicMap
+    
+    Parameters
+    ----------
+    datapath : str
+        The file location of the dataset to use
+    kwargs : dict
+        additional arguments to the DynamicMap opts function (customizations)
+    Returns
+    -------
+        A HoloViews DynamicMap containing the visualization
+    '''
+    xr_dataset = xr.open_dataset(datapath).load()
+    
     # fill in monte carlo coordinates
     num_coords = xr_dataset.dims['MCrun']
     mcrun_coords = []
@@ -79,7 +89,7 @@ def generate_geospatial(xr_dataset):
         i += 1
     xr_dataset = xr_dataset.assign_coords({'MCrun': mcrun_coords})
     
-    # get dims for gv
+    # get dims for visualization
     kdims = list(xr_dataset.dims.keys())
     vdims = list(xr_dataset.data_vars.keys())
 
@@ -87,13 +97,45 @@ def generate_geospatial(xr_dataset):
     gv_dataset = gv.Dataset(xr_dataset, kdims=kdims, vdims=vdims)
     
     # create visualization
-    return gv_dataset.to(gv.Image, ['lon', 'lat'], dynamic=True).opts(width=600, height=360, colorbar=True, cmap='plasma') * gv.feature.coastline()
+    dynamicMap = gv_dataset.to(gv.Image, ['lon', 'lat'], dynamic=True)
+    finalViz = dynamicMap.opts(**kwargs) * gv.feature.coastline()
+    return finalViz
     
 
 # takes in an xarray dataset and returns a 
-def generate_timeseries(xr_dataset):
-    if type(xr_dataset) is str:
-        xr_dataset = xr.open_dataset(datapath).load()
+def generate_timeseries_html(datapath, **kwargs):
+    '''Generates and returns the elements necessary to embed a bokeh plot in html
+    
+    Parameters
+    ----------
+    datapath : str
+        The file location of the dataset to use 
+    kwargs : dict
+        additional arguments to generate_timeseries
+    Returns
+    -------
+        A tuple containing an html <script> and a target <div> to display to 
+    '''
+    
+    plot = generate_timeseries(datapath, **kwargs)
+    script, div = components(plot)
+    return script, div
+
+def generate_timeseries(datapath, **kwargs):
+    '''Generates and returns a bokeh timeseries plot given a datapath
+    
+    Parameters
+    ----------
+    datapath : str
+        The file location of the dataset to use 
+    kwargs : dict
+        additional arguments to bokeh's figure function
+    Returns
+    -------
+        A bokeh figure containing the desired timeseries plot
+    '''
+
+    xr_dataset = xr.open_dataset(datapath).load()
     
     # Programatically assign members
     num_members = xr_dataset.dims['members']
@@ -123,17 +165,16 @@ def generate_timeseries(xr_dataset):
         times.append(x.year)
     
     # Plot code
-    p = figure(title=vdims[0].capitalize() + ' Over Time', plot_width=500, plot_height=500)
+    p = figure(title=vdims[0].capitalize() + ' Over Time', **kwargs)
     p.xaxis.axis_label = "Time"
     p.yaxis.axis_label = vdims[0]
     p.line(times, y)
-    script, div = components(p)
-    return script, div
-    
+    return p
     
 def start_server(threaded=False, io_loop=None, **kwargs):
     if threaded:
         if io_loop == None:
+            print('weird')
             loop = IOLoop()
         else:
             loop = io_loop
@@ -176,14 +217,14 @@ def add_viz_model(doc):
     args = doc.session_context.request.arguments
     if args.get('datapath') == None:
         viz = "Error occurred!"
-        print("Error occurred!")
+        print("Error occurred! Datapath not given!")
     else:
         datapath = str(args.get('datapath')[0].decode('UTF-8'))
         if not isfile(datapath):
             viz = "Error occurred!"
-            print("Error occurred!")
+            print(f"Error occurred! File at {datapath} not found!")
         else:
-            xr_dataset = xr.open_dataset(datapath).load()
-            viz = generate_geospatial(xr_dataset)
+            viz = generate_geospatial(datapath, width=600, height=360, colorbar=True, cmap='plasma')
     # create a panel from the holoviews DynamicMap and attach it to the document.
     panel(viz).server_doc(doc=doc)
+
