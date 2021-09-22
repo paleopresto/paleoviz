@@ -7,3 +7,4 @@ dependencies:
   - panel=0.11.0
   - xarray
   - netcdf4
+  - numpy=1.19.2
