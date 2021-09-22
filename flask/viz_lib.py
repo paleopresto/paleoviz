@@ -172,9 +172,21 @@ def generate_timeseries(datapath, **kwargs):
     return p
     
 def start_server(threaded=False, io_loop=None, **kwargs):
+    '''Generates and returns a bokeh timeseries plot given a datapath
+    
+    Parameters
+    ----------
+    threaded: bool
+        whether or not to run the server on a seperate thread of execution
+    io_loop: 
+    kwargs : dict
+        additional arguments to bokeh's figure function
+    Returns
+    -------
+        A StoppableThread that is running the BokehServer
+    '''
     if threaded:
         if io_loop == None:
-            print('weird')
             loop = IOLoop()
         else:
             loop = io_loop
@@ -200,7 +212,9 @@ def create_server(**kwargs):
         viz_server.io_loop.add_callback_from_signal(do_stop)
     
     def do_stop():
+        viz_server.stop(False)
         viz_server.io_loop.stop()
+        viz_server.io_loop.close()
         
     try:
         signal.signal(signal.SIGINT, signal_exit)

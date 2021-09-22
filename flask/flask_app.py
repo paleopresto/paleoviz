@@ -13,6 +13,9 @@ import json
 
 app = Flask(__name__)
 
+####################################
+## Global configuration variables ##
+####################################
 # filepath to look for a config file at
 config_filename = None;
 # bokeh server config 
@@ -27,11 +30,6 @@ flask_protocol = None
 flask_url = None
 
 data_dir = None
-
-
-
-
-
 
 # locally creates a page
 @app.route('/', methods=['POST', 'GET'])
@@ -116,4 +114,5 @@ if __name__ == '__main__':
 
     # stop the managed threads
     bokeh_server.stop()
+    
     print(' - Visualization server cleanup complete. Exiting...')
