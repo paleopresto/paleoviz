@@ -172,7 +172,7 @@ def generate_timeseries(datapath, **kwargs):
     return p
     
 def start_server(threaded=False, io_loop=None, **kwargs):
-    '''Generates and returns a bokeh timeseries plot given a datapath
+    '''Either returns a thread to run create_server or runs create_server with given or new io_loop
     
     Parameters
     ----------
@@ -199,6 +199,16 @@ def start_server(threaded=False, io_loop=None, **kwargs):
     
     
 def create_server(**kwargs):
+    '''Creates a new BokehServer object with the required handlers
+    
+    Parameters
+    ----------
+    kwargs : dict
+        additional arguments to pass to bokeh Server function
+    Returns
+    -------
+        The BokehServer that has been started
+    '''
     # create a handler for application. Should only need the one
     viz_handlers = FunctionHandler(add_viz_model)
     
@@ -229,6 +239,16 @@ def create_server(**kwargs):
     
     
 def add_viz_model(doc):
+    '''Adds a geospatial visualization to a given bokeh Document object
+    
+    Parameters
+    ----------
+    doc: Document
+        A bokeh document to add a new geospatial visualization model to.
+    Returns
+    -------
+    None
+    '''
     args = doc.session_context.request.arguments
     if args.get('datapath') == None:
         viz = "Error occurred!"
