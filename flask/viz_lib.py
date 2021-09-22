@@ -178,9 +178,10 @@ def start_server(threaded=False, io_loop=None, **kwargs):
     ----------
     threaded: bool
         whether or not to run the server on a seperate thread of execution
-    io_loop: 
+    io_loop: IOLoop | None
+        An io loop to use with the server. If None and threaded=True, create a new io loop
     kwargs : dict
-        additional arguments to bokeh's figure function
+        additional arguments to pass to create_server
     Returns
     -------
         A StoppableThread that is running the BokehServer
