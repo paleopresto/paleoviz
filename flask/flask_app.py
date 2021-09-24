@@ -78,7 +78,12 @@ if __name__ == '__main__':
     except OSError as ose:
         print('Error occurred while attempting to open config file. Using defaults...')
         # use defaults
-        config_dict = {'bokeh_port_num':5005, 'flask_port_num':5000, 'bokeh_host':'localhost', 'flask_host':'localhost'}
+        config_dict = {'bokeh_port_num':5005, 
+                       'flask_port_num':5000,
+                       'bokeh_host':'localhost',
+                       'flask_host':'localhost',
+                       "bokeh_protocol": "http",
+                       "flask_protocol": "http"}
         with open('server_config.json', 'w') as config_file:
             json.dump(config_dict, config_file)
 
@@ -101,14 +106,13 @@ if __name__ == '__main__':
     print(f"  - Flask server port: {flask_port_num}\n  - Flask hostname: {flask_host}\n  - Flask protocol: {flask_protocol}")
     print(f"  - Bokeh server port: {bokeh_port_num}\n  - Bokeh hostname: {bokeh_host}\n  - Bokeh protocol: {bokeh_protocol}")
     print(f' - Starting embedded bokeh server on port {bokeh_port_num}...')
-    bokeh_server = vl.start_server(threaded=True, allow_websocket_origin=[flask_url], show=False, port=bokeh_port_num)
+    bokeh_server = vl.start_server(threaded=True, allow_websocket_origin=[flask_host], show=False, port=bokeh_port_num)
     bokeh_server.start()
     if bokeh_server.is_alive():
         print(' - Bokeh server created successfully!')
     else:
         print('Bokeh server encountered an error! Exiting...')
         exit()
-    print(type(bokeh_server.io_loop))
     # start main app server loop
     app.run(host=flask_host, port=flask_port_num, debug=True, use_reloader=False)
     
