@@ -36,8 +36,7 @@ hv.extension('bokeh')
 
 
 def get_viz_type(datapath):
-    '''Generates either a time series(as a tuple of string),
-    geospatial visualization, or returns None
+    '''Generates either a time series(as a tuple of string), geospatial visualization, or returns None
     
     Parameters
     ----------
